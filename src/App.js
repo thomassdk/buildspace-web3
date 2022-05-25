@@ -11,7 +11,7 @@ import note from 'midi-note'
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
-const contractAddress = "0x7E579a7338a81195358Dc5B7C41dF572A6c578A6";
+const contractAddress = "0x1214E571ce78B6FBDfe6Dc2159DA4FE4a0543599"
 const contractABI = abi.abi;
 const noteRange = {
   first: MidiNumbers.fromNote('c3'),
