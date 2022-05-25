@@ -194,7 +194,7 @@ export default function App() {
         />
         {allWaves.length ?
           <p className="total">{allWaves.length} notes played!</p>
-          : <span role="img">🎷</span>}
+          : <span className="sax" role="img">🎷</span>}
         {allWaves.map((wave, index) => {
           return (
             <div key={index} className="waves" >

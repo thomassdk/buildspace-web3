@@ -78,7 +78,11 @@ div[data-testid] {
 
 .total {
   font-family: Ultra;
-  font-size: smaller;
   margin-bottom: 0;
   color: grey;
+}
+
+.sax {
+  font-size: xxx-large;
+  text-align: center;
 }
