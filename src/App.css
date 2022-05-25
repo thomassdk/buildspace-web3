@@ -1,3 +1,18 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+
+p {
+  font-weight: lighter;
+  font-family: "Libre Calson Text";
+  text-align: center;
+}
+
 .mainContainer {
   display: flex;
   justify-content: center;
@@ -21,7 +36,8 @@
 .bio {
   text-align: center;
   color: gray;
-  margin-top: 16px;
+  margin-top: 0;
+  font-size: x-large;
 }
 
 .waveButton {
@@ -30,5 +46,39 @@
   padding: 8px;
   border: 0;
   border-radius: 5px;
-  
+  width: content;
+}
+
+.connectButton {
+  cursor: pointer;
+  margin-top: 16px;
+  padding: 8px;
+  border: 0;
+  border-radius: 5px;
+  width: content;
+  background-color: lightcoral;
+}
+
+.instructions {
+  text-align: center;
+}
+
+div[data-testid] {
+  width: fit-content !important;
+  margin: auto !important;
+}
+
+.waves {
+  font-size: small;
+  background-color: OldLace;
+  margin-top: 16px;
+  padding: 8px;
+  font-family: "Libre Calson Text";
+}
+
+.total {
+  font-family: Ultra;
+  font-size: smaller;
+  margin-bottom: 0;
+  color: grey;
 }
