@@ -8,6 +8,7 @@ import { Piano, MidiNumbers } from '@fabb/react-piano';
 import './piano.css'
 import Abcjs from 'react-abcjs'
 import { scientificToAbcNotation } from "@tonaljs/abc-notation";
+import PlayIcon from './MaterialSymbolsPlayCircle';
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -189,10 +190,6 @@ export default function App() {
         }
 
         <p className="instructions">Help me sing it <span role="img" aria-label="music notes">🎶️</span> by playing a note</p>
-        <button onClick={() => playName(allNotes.map(note => note.note))} >
-          Play Name
-        </button>
-
         <SoundfontProvider
           instrumentName={instrument}
           audioContext={audioContext}
@@ -209,7 +206,14 @@ export default function App() {
           )}
         />
         {allNotes.length ?
-          <p className="total">{allNotes.length} note{allNotes.length > 1 && "s"} played!</p>
+          <p className="total">
+            {allNotes.length} note{allNotes.length > 1 && "s"} played!
+            &nbsp;&nbsp;
+            <PlayIcon
+              className="playIcon"
+              onClick={() => playName(allNotes.map(note => note.note))}
+            />
+          </p>
           : <span className="sax" role="img" aria-label="radio">📻</span>}
 
         <Abcjs

@@ -87,3 +87,12 @@ div[data-testid] {
   text-align: center;
   margin-top: 20px;
 }
+
+.playIcon {
+  font-size: 35px;
+  vertical-align: middle;
+}
+
+.playIcon :hover {
+  cursor: pointer;
+}
