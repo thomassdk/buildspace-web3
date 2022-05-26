@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import './App.css';
-import abi from "./utils/WavePortal.json";
+import abi from "./utils/NotePortal.json";
 import SoundfontProvider from './SoundfontProvider';
 import { Piano, MidiNumbers } from '@fabb/react-piano';
 import './piano.css'
@@ -12,7 +12,7 @@ import { scientificToAbcNotation } from "@tonaljs/abc-notation";
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
-const contractAddress = "0x1214E571ce78B6FBDfe6Dc2159DA4FE4a0543599"
+const contractAddress = "0x0Ac0754D287C67cACD6B6C067db89243902C0654";
 const contractABI = abi.abi;
 const noteRange = {
   first: MidiNumbers.fromNote('c4'),
@@ -24,8 +24,8 @@ export default function App() {
    * Just a state variable we use to store our user's public wallet.
    */
   const [currentAccount, setCurrentAccount] = useState("");
-  const [allWaves, setAllWaves] = useState([]);
-  const [waveContract, setWaveContract] = useState(null);
+  const [allNotes, setAllNotes] = useState([]);
+  const [noteContract, setNoteContract] = useState(null);
   const [writingToBlock, setWritingToBlock] = useState(false);
 
   const checkIfWalletIsConnected = async () => {
@@ -48,7 +48,7 @@ export default function App() {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account)
-        await getAllWaves();
+        await getAllNotes();
       } else {
         console.log("No authorized account found")
         setCurrentAccount("wallet-needed")
@@ -74,7 +74,7 @@ export default function App() {
 
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
-      await getAllWaves();
+      await getAllNotes();
     } catch (error) {
       console.log(error)
     }
@@ -82,39 +82,39 @@ export default function App() {
 
 
   /*
-   * Create a method that gets all waves from your contract
+   * Create a method that gets all notes from your contract
    */
-  const getAllWaves = async () => {
+  const getAllNotes = async () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+        const notePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-        setWaveContract(wavePortalContract);
+        setNoteContract(notePortalContract);
         /*
-         * Call the getAllWaves method from your Smart Contract
+         * Call the getAllNotes method from your Smart Contract
          */
-        const waves = await wavePortalContract.getAllWaves();
+        const notes = await notePortalContract.getAllNotes();
 
         /*
          * We only need address, timestamp, and message in our UI so let's
          * pick those out
          */
-        let wavesCleaned = [];
-        waves.forEach(wave => {
-          wavesCleaned.push({
-            address: wave.waver,
-            timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message
+        let notesCleaned = [];
+        notes.forEach(note => {
+          notesCleaned.push({
+            address: note.player,
+            timestamp: new Date(note.timestamp * 1000),
+            note: note.note
           });
         });
 
         /*
          * Store our data in React State
          */
-        setAllWaves(wavesCleaned);
+        setAllNotes(notesCleaned);
       } else {
         console.log("Ethereum object doesn't exist!")
       }
@@ -123,27 +123,28 @@ export default function App() {
     }
   }
 
-  const wave = async (note) => {
+  const note = async (note) => {
     try {
       const { ethereum } = window;
       setWritingToBlock(true);
 
       if (ethereum) {
-        let count = await waveContract.getTotalWaves();
+        let count = await noteContract.getTotalNotes();
         console.log("Retrieved total note count...", count.toNumber());
 
         /*
-        * Execute the actual wave from your smart contract
+        * Execute the actual note from your smart contract
         */
-        const waveTxn = await waveContract.wave(note.toString());
-        console.log("Mining...", waveTxn.hash);
+        const noteTxn = await noteContract.playNote(note.toString());
+        console.log("Mining...", noteTxn.hash);
 
-        await waveTxn.wait();
-        console.log("Mined -- ", waveTxn.hash);
+        await noteTxn.wait();
+        console.log("Mined -- ", noteTxn.hash);
 
-        count = await waveContract.getTotalWaves();
-        console.log("Retrieved total wave count...", count.toNumber());
+        count = await noteContract.getTotalNotes();
+        console.log("Retrieved total note count...", count.toNumber());
 
+        await getAllNotes();
         setWritingToBlock(false);
       } else {
         console.log("Ethereum object doesn't exist!");
@@ -177,7 +178,7 @@ export default function App() {
           </button>
         }
 
-        <p className="instructions">Send me a note <span role="img" aria-label="music notes">🎶️</span> by playing the piano</p>
+        <p className="instructions">Help me sing it <span role="img" aria-label="music notes">🎶️</span> by playing a note</p>
 
         <SoundfontProvider
           instrumentName="acoustic_grand_piano"
@@ -188,20 +189,20 @@ export default function App() {
               noteRange={noteRange}
               width={500}
               playNote={playNote}
-              stopNote={(midi) => { wave(midi); stopNote(midi) }}
+              stopNote={(midi) => { note(midi); stopNote(midi) }}
               disabled={isLoading || writingToBlock}
               renderNoteLabel={({ midiNumber }) => MidiNumbers.getAttributes(midiNumber).note}
             />
           )}
         />
-        {allWaves.length ?
-          <p className="total">{allWaves.length} note{allWaves.length > 1 && "s"} played!</p>
-          : <span className="sax" role="img" aria-label="saxaphone">🎷</span>}
+        {allNotes.length ?
+          <p className="total">{allNotes.length} note{allNotes.length > 1 && "s"} played!</p>
+          : <span className="sax" role="img" aria-label="radio">📻</span>}
 
         <Abcjs
           abcNotation={
-            `\nM:4/4\n ${allWaves
-              .map(note => `${scientificToAbcNotation(MidiNumbers.getAttributes(note.message).note)}2`)
+            `\nM:4/4\n ${allNotes
+              .map(note => `${scientificToAbcNotation(MidiNumbers.getAttributes(note.note).note)}2`)
               .join(" ")}`
           }
           parserParams={{}}
@@ -209,12 +210,12 @@ export default function App() {
           renderParams={{ viewportHorizontal: true }}
         />
 
-        {allWaves.map((wave, index) => {
+        {allNotes.map((note, index) => {
           return (
-            <div key={index} className="waves" >
-              <div>Address: {wave.address}</div>
-              <div>Time: {wave.timestamp.toString()}</div>
-              <div>Message: {MidiNumbers.getAttributes(wave.message).note}</div>
+            <div key={index} className="notes" >
+              <div>Player: {note.address}</div>
+              <div>Time: {note.timestamp.toString()}</div>
+              <div>Note: {MidiNumbers.getAttributes(note.note).note}</div>
             </div>)
         })}
       </div>
