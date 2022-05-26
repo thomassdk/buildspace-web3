@@ -35,7 +35,7 @@ p {
 
 .bio {
   text-align: center;
-  color: gray;
+  color: #555;
   margin-top: 0;
   font-size: x-large;
 }
@@ -70,19 +70,19 @@ div[data-testid] {
 
 .notes {
   font-size: small;
-  background-color: OldLace;
   margin-top: 16px;
   padding: 8px;
-  font-family: "Libre Calson Text";
+  font-weight: lighter;
+  font-size: x-small;
 }
 
 .total {
   font-family: Ultra;
   margin-bottom: 0;
-  color: grey;
+  color: #555;
 }
 
-.sax {
+.radio {
   font-size: xxx-large;
   text-align: center;
   margin-top: 20px;

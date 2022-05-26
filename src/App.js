@@ -214,7 +214,7 @@ export default function App() {
               onClick={() => playName(allNotes.map(note => note.note))}
             />
           </p>
-          : <span className="sax" role="img" aria-label="radio">📻</span>}
+          : <span className="radio" role="img" aria-label="radio">📻</span>}
 
         <Abcjs
           abcNotation={
@@ -228,11 +228,13 @@ export default function App() {
         />
 
         {allNotes.map((note, index) => {
+          const midiNote = MidiNumbers.getAttributes(note.note).note;
+          const color = midiNote.includes("b") ? { background: "#555", font: "#f6f5f3" } : { background: "#f6f5f3", font: "#555" };
           return (
-            <div key={index} className="notes" >
+            <div key={index} className="notes" style={{ backgroundColor: color.background, color: color.font }}>
               <div>Player: {note.address}</div>
               <div>Time: {note.timestamp.toString()}</div>
-              <div>Note: {MidiNumbers.getAttributes(note.note).note}</div>
+              <div>Note: {midiNote}</div>
             </div>)
         })}
       </div>
