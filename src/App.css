@@ -72,8 +72,7 @@ div[data-testid] {
   font-size: small;
   margin-top: 16px;
   padding: 8px;
-  font-weight: lighter;
-  font-size: x-small;
+  font-family: Roboto;
 }
 
 .total {
