@@ -26,6 +26,7 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [allWaves, setAllWaves] = useState([]);
   const [waveContract, setWaveContract] = useState(null);
+  const [writingToBlock, setWritingToBlock] = useState(false);
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -125,6 +126,7 @@ export default function App() {
   const wave = async (note) => {
     try {
       const { ethereum } = window;
+      setWritingToBlock(true);
 
       if (ethereum) {
         let count = await waveContract.getTotalWaves();
@@ -141,10 +143,14 @@ export default function App() {
 
         count = await waveContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+
+        setWritingToBlock(false);
       } else {
         console.log("Ethereum object doesn't exist!");
+        setWritingToBlock(false);
       }
     } catch (error) {
+      setWritingToBlock(false);
       console.log(error);
     }
   }
@@ -183,7 +189,7 @@ export default function App() {
               width={500}
               playNote={playNote}
               stopNote={(midi) => { wave(midi); stopNote(midi) }}
-              disabled={isLoading}
+              disabled={isLoading || writingToBlock}
               renderNoteLabel={({ midiNumber }) => MidiNumbers.getAttributes(midiNumber).note}
             />
           )}
@@ -192,16 +198,16 @@ export default function App() {
           <p className="total">{allWaves.length} note{allWaves.length > 1 && "s"} played!</p>
           : <span className="sax" role="img" aria-label="saxaphone">🎷</span>}
 
-      <Abcjs
-        abcNotation={
-          `\nM:4/4\n ${allWaves
-                        .map(note => `${scientificToAbcNotation(MidiNumbers.getAttributes(note.message).note)}2`)
-                        .join(" ")}`
-        }
-        parserParams={{}}
-        engraverParams={{ responsive: 'resize' }}
-        renderParams={{ viewportHorizontal: true }}
-      />
+        <Abcjs
+          abcNotation={
+            `\nM:4/4\n ${allWaves
+              .map(note => `${scientificToAbcNotation(MidiNumbers.getAttributes(note.message).note)}2`)
+              .join(" ")}`
+          }
+          parserParams={{}}
+          engraverParams={{ responsive: 'resize' }}
+          renderParams={{ viewportHorizontal: true }}
+        />
 
         {allWaves.map((wave, index) => {
           return (
