@@ -91,13 +91,12 @@ export default function App() {
     }
   }
 
-
   /*
    * Create a method that gets all notes from your contract
    */
   const getAllNotes = async () => {
+    const { ethereum } = window;
     try {
-      const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
@@ -167,9 +166,39 @@ export default function App() {
     }
   }
 
+  /**
+   * Listen in for emitter events!
+   */
   useEffect(() => {
     checkIfWalletIsConnected();
-  }, [])
+    let NotePortalContract;
+
+    const onNewNote = (from, timestamp, note) => {
+      console.log("NewNote", from, timestamp, note);
+      setAllNotes(prevState => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          note,
+        },
+      ]);
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      NotePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+      NotePortalContract.on("NewNote", onNewNote);
+    }
+
+    return () => {
+      if (NotePortalContract) {
+        NotePortalContract.off("NewNote", onNewNote);
+      }
+    };
+  }, []);
 
   return (
     <div className="mainContainer">
