@@ -7,8 +7,10 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@tonaljs/abc-notation": "^4.6.5",
     "ethers": "^5.4.4",
     "react": "^16.12.0",
+    "react-abcjs": "^0.1.3",
     "react-dom": "^16.12.0",
     "react-scripts": "3.2.0",
     "soundfont-player": "^0.12.0"

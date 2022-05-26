@@ -5,6 +5,8 @@ import abi from "./utils/WavePortal.json";
 import SoundfontProvider from './SoundfontProvider';
 import { Piano, MidiNumbers } from '@fabb/react-piano';
 import './piano.css'
+import Abcjs from 'react-abcjs'
+import { scientificToAbcNotation } from "@tonaljs/abc-notation";
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -13,8 +15,8 @@ const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 const contractAddress = "0x1214E571ce78B6FBDfe6Dc2159DA4FE4a0543599"
 const contractABI = abi.abi;
 const noteRange = {
-  first: MidiNumbers.fromNote('c3'),
-  last: MidiNumbers.fromNote('f4'),
+  first: MidiNumbers.fromNote('c4'),
+  last: MidiNumbers.fromNote('f5'),
 };
 
 export default function App() {
@@ -149,7 +151,7 @@ export default function App() {
 
   useEffect(() => {
     checkIfWalletIsConnected();
-  })
+  }, [])
 
   return (
     <div className="mainContainer">
@@ -189,12 +191,24 @@ export default function App() {
         {allWaves.length ?
           <p className="total">{allWaves.length} note{allWaves.length > 1 && "s"} played!</p>
           : <span className="sax" role="img" aria-label="saxaphone">🎷</span>}
+
+      <Abcjs
+        abcNotation={
+          `\nM:4/4\n ${allWaves
+                        .map(note => `${scientificToAbcNotation(MidiNumbers.getAttributes(note.message).note)}2`)
+                        .join(" ")}`
+        }
+        parserParams={{}}
+        engraverParams={{ responsive: 'resize' }}
+        renderParams={{ viewportHorizontal: true }}
+      />
+
         {allWaves.map((wave, index) => {
           return (
             <div key={index} className="waves" >
               <div>Address: {wave.address}</div>
               <div>Time: {wave.timestamp.toString()}</div>
-            <div>Message: {MidiNumbers.getAttributes(wave.message).note}</div>
+              <div>Message: {MidiNumbers.getAttributes(wave.message).note}</div>
             </div>)
         })}
       </div>
