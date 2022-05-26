@@ -3,9 +3,8 @@ import { ethers } from "ethers";
 import './App.css';
 import abi from "./utils/WavePortal.json";
 import SoundfontProvider from './SoundfontProvider';
-import { Piano, KeyboardShortcuts, MidiNumbers } from '@fabb/react-piano';
+import { Piano, MidiNumbers } from '@fabb/react-piano';
 import './piano.css'
-import note from 'midi-note'
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -17,11 +16,6 @@ const noteRange = {
   first: MidiNumbers.fromNote('c3'),
   last: MidiNumbers.fromNote('f4'),
 };
-const keyboardShortcuts = KeyboardShortcuts.create({
-  firstNote: noteRange.first,
-  lastNote: noteRange.last,
-  keyboardConfig: KeyboardShortcuts.HOME_ROW,
-});
 
 export default function App() {
   /*
@@ -155,14 +149,14 @@ export default function App() {
 
   useEffect(() => {
     checkIfWalletIsConnected();
-  }, [])
+  })
 
   return (
     <div className="mainContainer">
       <div className="dataContainer">
 
         <div className="header">
-          <h1><span role="img">🕴️</span> Hey there <span role="img">🕴️</span></h1>
+          <h1><span role="img" aria-label="person in suit levitating">🕴️</span> Hey there <span role="img" aria-label="person in suit levitating">🕴️</span></h1>
         </div>
 
         <div className="bio">
@@ -175,7 +169,7 @@ export default function App() {
           </button>
         }
 
-        <p className="instructions">Send me a note <span role="img">🎶️</span> by playing the piano</p>
+        <p className="instructions">Send me a note <span role="img" aria-label="music notes">🎶️</span> by playing the piano</p>
 
         <SoundfontProvider
           instrumentName="acoustic_grand_piano"
@@ -184,23 +178,23 @@ export default function App() {
           render={({ isLoading, playNote, stopNote }) => (
             <Piano
               noteRange={noteRange}
-              width={300}
+              width={500}
               playNote={playNote}
               stopNote={(midi) => { wave(midi); stopNote(midi) }}
               disabled={isLoading}
-              keyboardShortcuts={keyboardShortcuts}
+              renderNoteLabel={({ midiNumber }) => MidiNumbers.getAttributes(midiNumber).note}
             />
           )}
         />
         {allWaves.length ?
-          <p className="total">{allWaves.length} note{allWaves.length > 1 ? "s" : ""} played!</p>
-          : <span className="sax" role="img">🎷</span>}
+          <p className="total">{allWaves.length} note{allWaves.length > 1 && "s"} played!</p>
+          : <span className="sax" role="img" aria-label="saxaphone">🎷</span>}
         {allWaves.map((wave, index) => {
           return (
             <div key={index} className="waves" >
               <div>Address: {wave.address}</div>
               <div>Time: {wave.timestamp.toString()}</div>
-              <div>Message: {note(wave.message)}</div>
+            <div>Message: {MidiNumbers.getAttributes(wave.message).note}</div>
             </div>)
         })}
       </div>
