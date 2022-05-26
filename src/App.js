@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import './App.css';
 import abi from "./utils/NotePortal.json";
 import SoundfontProvider from './SoundfontProvider';
+import Soundfont from 'soundfont-player'
 import { Piano, MidiNumbers } from '@fabb/react-piano';
 import './piano.css'
 import Abcjs from 'react-abcjs'
@@ -11,6 +12,15 @@ import { scientificToAbcNotation } from "@tonaljs/abc-notation";
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
+const instrument = "acoustic_grand_piano";
+
+function playName(notes) {
+  //NOTE: Expand this so that the schedule is based on difference between different message timestamps?
+  const schedule = notes.map((note, index) => ({ time: index * 0.5, note }))
+  Soundfont.instrument(audioContext, instrument).then((piano) => {
+    piano.schedule(audioContext.currentTime, schedule)
+  })
+}
 
 const contractAddress = "0x0Ac0754D287C67cACD6B6C067db89243902C0654";
 const contractABI = abi.abi;
@@ -179,9 +189,12 @@ export default function App() {
         }
 
         <p className="instructions">Help me sing it <span role="img" aria-label="music notes">🎶️</span> by playing a note</p>
+        <button onClick={() => playName(allNotes.map(note => note.note))} >
+          Play Name
+        </button>
 
         <SoundfontProvider
-          instrumentName="acoustic_grand_piano"
+          instrumentName={instrument}
           audioContext={audioContext}
           hostname={soundfontHostname}
           render={({ isLoading, playNote, stopNote }) => (
