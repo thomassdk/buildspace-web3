@@ -146,7 +146,7 @@ export default function App() {
         /*
         * Execute the actual note from your smart contract
         */
-        const noteTxn = await noteContract.playNote(note.toString());
+        const noteTxn = await noteContract.playNote(note.toString(), { gasLimit: 300000 });
         console.log("Mining...", noteTxn.hash);
 
         await noteTxn.wait();
